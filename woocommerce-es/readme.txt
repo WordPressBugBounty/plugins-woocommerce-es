@@ -4,8 +4,8 @@ Tags: woocommerce, translation, spanish, es, es_ES, webshop, ecommerce, e-commer
 Donate link: https://close.marketing/go/donate/
 Requires at least: 3.0
 WC requires at least: 4.0
-WC tested up to: 8.0
-Tested up to: 6.5.0
+WC tested up to: 9.3
+Tested up to: 6.7
 Stable tag: 2.1.2
 Version: 2.1.2
 
