@@ -1,0 +1,162 @@
+.connect-ecommerce-settings #wcpimh_stock,
+.connect-ecommerce-settings #wcpimh_catsep {
+	width: 70px;
+}
+
+.connect-ecommerce-settings #wcpimh_idcentre,
+.connect-ecommerce-settings #wcpimh_sync_num {
+	width: 60px;
+}
+
+.connect-ecommerce-settings #wcpimh_prodst {
+	width: 150px;
+}
+
+.connect-ecommerce-settings #wcpimh_api,
+.connect-ecommerce-settings #wcpimh_taxinc {
+	width: 326px;
+}
+
+.connect-ecommerce-settings .connwoo-sync-engine #logwrapper {
+	border: 1px solid #aaa;
+	margin: 10px auto;
+}
+
+.connect-ecommerce-settings .connwoo-sync-engine fieldset {
+	padding: 20px;
+	width: auto;
+}
+
+.connect-ecommerce-settings .connwoo-sync-engine #loglist {
+	border: 1px solid #AAAAAA;
+	height: 380px;
+	overflow: auto;
+}
+
+.connect-ecommerce-settings .connwoo-sync-engine #loglist>p {
+	margin: 0;
+	padding: 3px 5px;
+}
+
+.connect-ecommerce-settings .connwoo-sync-engine #loglist>p.odd {
+	background: #dfdfdf;
+}
+
+.connect-ecommerce-settings .connwoo-sync-engine #loglist>p.finish {
+	background: #76d771;
+}
+
+.connect-ecommerce-settings .connwoo-sync-engine .error {
+	color: red;
+}
+
+.connect-ecommerce-settings .connwoo-sync-engine .warning {
+	color: orange;
+}
+
+.connect-ecommerce-settings .connwoo-header {
+	background: #010101 url('background.jpg');
+	margin-left: -20px;
+	padding: 20px 15%;
+	display: flex;
+	justify-content: space-between;
+	color: white;
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+.connect-ecommerce-settings .connwoo-header .logo {
+	min-width: 20%;
+}
+
+.connect-ecommerce-settings .connwoo-header h2 {
+	float: right;
+	color: white;
+	padding: 10px 0 0 30px;
+	margin: 0;
+}
+
+.connect-ecommerce-settings .repeater-section .product-mergevars {
+	display: grid;
+	grid-template-columns: 3fr 1fr 1fr 3fr 1fr;
+}
+
+.connect-ecommerce-settings .repeater-section .dashicons {
+	padding-top: 4px;
+	padding-right: 5px;
+}
+
+.connect-ecommerce-settings .repeater-section .dashicons.dashicons-arrow-right-alt2 {
+	padding-top: 7px;
+}
+
+.connect-ecommerce-settings .progress-bar {
+	background-color: #1a1a1a;
+	height: 16px;
+	padding: 5px;
+	width: 100%;
+	margin: 5px 0;
+	border-radius: 5px;
+	box-shadow: 0 1px 5px #000 inset, 0 1px 0 #444;
+}
+
+.connect-ecommerce-settings .progress-bar span {
+	display: inline-block;
+	float: left;
+	height: 100%;
+	border-radius: 3px;
+	box-shadow: 0 1px 0 rgba(255, 255, 255, .5) inset;
+	transition: width .4s ease-in-out;
+}
+
+.connect-ecommerce-settings .blue span {
+	background-color: #2271b1;
+}
+
+.connect-ecommerce-settings .progress-text {
+	text-align: right;
+	color: white;
+	margin: 0;
+	font-size: 18px;
+	position: absolute;
+	right: 18px;
+}
+
+/* Taxes Rates */
+.connect-update-tax-rates-wrapper {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 10px;
+	justify-content: flex-end;
+}
+
+.connect-update-tax-rates-wrapper label {
+	font-weight: bold;
+}
+
+.connect-update-tax-rates-wrapper select {
+	width: auto;
+}
+
+.connect-update-tax-rates-wrapper .button {
+	background-color: #010101;
+	border-color: #010101;
+	color: white;
+}
+
+.connect-update-tax-rates-wrapper .button:hover {
+	background-color: #010101;
+	border-color: #010101;
+	color: white;
+}
+
+.wc_tax_rates th.erp-tax-header,
+.wc_tax_rates td.erp_tax_type {
+	width: 15%;
+}
+
+.wc_tax_rates td.erp_tax_type select {
+	width: 85%;
+	margin: 10px;
+}

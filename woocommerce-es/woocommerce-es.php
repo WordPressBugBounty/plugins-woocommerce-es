@@ -1,106 +1,123 @@
 <?php
-/*
- * Plugin Name: WPSPA Spanish Enhacements for WooCommerce
- * Plugin URI: http://www.closemarketing.es/portafolio/plugin-woocommerce-espanol/
- * Description: Extends the WooCommerce plugin for Spanish needs: EU VAT included in form and order, and add-ons with the Spanish language.
- *
- * Version: 2.1.2
- * Requires at least: 5.0
- *
- * WC requires at least: 3.0
- * WC tested up to: 4.1
- *
- * Author: Closemarketing
- * Author URI: http://www.closemarketing.net/
- *
- * Text Domain: woocommerce-es
- * Domain Path: /languages/
- *
- * License: GNU General Public License v3.0
- * License URI: http://www.gnu.org/licenses/gpl-3.0.html
-*/
-
-define( 'WCES_NAME', 'WPSPA Spanish Enhacements for WooCommerce' );
-define( 'WPSPA_VERSION', '2.1.2' );
-define( 'WCES_REQUIRED_PHP_VERSION', '5.4' );
-define( 'WCES_REQUIRED_WP_VERSION', '4.6' );
-define( 'WCES_REQUIRED_WC_VERSION', '2.6' );
-
-add_action( 'init', 'wces_update_options_settings' );
 /**
- * Update process
+ * Plugin Name:       Connect and EU VAT Compliance for WooCommerce
+ * Plugin URI:        https://close.technology/wordpress-plugins/connect-ecommerce/
+ * Description:       Connects Ecommerce WooCommerce to ERPs and CRMs. Syncs products, customers, orders and stock. Includes EU VAT Compliance. Import European Taxes and check VAT compliance.
+ * Author:            Closetechnology
+ * Author URI:        https://close.technology/
+ * Version:           3.3.2
+ * Requires PHP:      7.4
+ * Requires at least: 6.3
+ * Text Domain:       woocommerce-es
+ * Requires Plugins:  woocommerce
+ * License:           GPL-2.0+
+ * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  *
- * @return boolean
+ * Prefix:            conecom_
+ *
+ * @package WordPress
  */
-function wces_update_options_settings() {
-	$old_version = get_option( 'wces_plugin_version', '1.7' );
 
-	if ( ! ( version_compare( $old_version, WPSPA_VERSION ) < 0 ) ) {
-		return false;
-	}
-	$array_options = array(
-		'wces_vat_show'      => 'vat_show',
-		'wces_vat_mandatory' => 'vat_mandatory',
-		'wces_opt_checkout'  => 'opt_checkout',
-		'wces_company'       => 'company_field',
+defined( 'ABSPATH' ) || exit;
+
+define( 'CONECOM_VERSION', '3.3.2' );
+define( 'CONECOM_FILE', __FILE__ );
+define( 'CONECOM_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+define( 'CONECOM_PLUGIN_PATH', plugin_dir_path( __FILE__ ) );
+define(
+	'CONECOM_VAT_FIELD_SLUGS',
+	array(
+		'_billing_vat',
+		'_billing_nif',
+		'_billing_vat_number',
+		'billing_vat',
+		'_wc_shipping/connect_ecommerce/billing_vat', // Gutenberg compatibility.
+		'VAT Number',
+	)
+);
+
+require_once CONECOM_PLUGIN_PATH . 'vendor/autoload.php';
+
+/**
+ * Gets the options for the plugin.
+ *
+ * @return array
+ */
+function conecom_get_options() {
+		/**
+	 * Default values
+	 */
+	global $wpdb;
+
+	return apply_filters(
+		'conecom_options_plugin',
+		array(
+			'clientify' => array(
+				'name'                       => 'Clientify',
+				'slug'                       => 'conecom-clientify',
+				'version'                    => CONECOM_VERSION,
+				'plugin_name'                => 'Connect WooCommerce Clientify',
+				'plugin_slug'                => 'connect-ecommerce-clientify',
+				'disable_modules'            => array( 'subscription' ),
+				'api_pagination'             => 100,
+				'product_price_tax_option'   => true,
+				'product_price_rate_option'  => false,
+				'product_option_stock'       => false,
+				'order_send_attachments'     => true,
+				'order_sync_partial'         => true,
+				'order_import_free_order'    => true,
+				'order_only_order_completed' => 'completed',
+				'settings_logo'              => CONECOM_PLUGIN_URL . 'includes/Connector/assets/logo.svg',
+				'settings_admin_message'     => sprintf(
+					// translators: %s url of contact.
+					__( 'Put the connection API key settings in order to connect and sync products. You can go here <a href = "%s" target = "_blank">App Test API</a>.', 'woocommerce-es' ),
+					'https://app.test.com/api'
+				),
+				'settings_special_tabs'      => array(),
+				'settings_fields'            => array( 'apipassword' ),
+				'table_sync'                 => $wpdb->prefix . 'sync_conecom-clientify',
+				'file'                       => __FILE__,
+			),
+		)
 	);
-	foreach ( $array_options as $key => $new_key ) {
-		$value_option = get_option( $key );
-		if ( $value_option ) {
-			$actual_options             = get_option( 'wces_settings' );
-			$actual_options[ $new_key ] = $value_option;
-			delete_option( $key );
-			update_option( 'wces_settings', $actual_options );
-		}
-	}
-	update_option( 'wpspa_plugin_version', WPSPA_VERSION );
 }
 
+add_action( 'init', 'conecom_loads' );
 /**
- * Checks if the system requirements are met
+ * Connect WooCommerce loads.
  *
- * @return bool True if system requirements are met, false if not
+ * @return void
  */
-function wces_requirements_met() {
-	global $wp_version;
-	require_once( ABSPATH . '/wp-admin/includes/plugin.php' );  // to get is_plugin_active() early
+function conecom_loads() {
+	require_once CONECOM_PLUGIN_PATH . 'includes/Plugin_Main.php';
+	require_once CONECOM_PLUGIN_PATH . 'includes/Connector/class-api-clientify.php';
 
-	if ( version_compare( PHP_VERSION, WCES_REQUIRED_PHP_VERSION, '<' ) ) {
-		return false;
-	}
-
-	if ( version_compare( $wp_version, WCES_REQUIRED_WP_VERSION, '<' ) ) {
-		return false;
-	}
-
-	if ( ! is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
-		return false;
-	}
-
-	$woocommer_data = get_plugin_data( WP_PLUGIN_DIR . '/woocommerce/woocommerce.php', false, false );
-
-	if ( version_compare( $woocommer_data['Version'], WCES_REQUIRED_WC_VERSION, '<' ) ) {
-		return false;
-	}
-
-	return true;
+	$conecom_options = conecom_get_options();
+	new CLOSE\ConnectEcommerce\Base( $conecom_options );
 }
 
-function wces_requirements_error () {
-	?>
-	<div class="notice notice-success is-dismissible">
-		<p>
-			<?php esc_html_e( 'You need to install WooCommerce in order to use the plugin:', 'woocommerce-es' ); ?>
-			<strong>WooCommerce Enhancements for Spanish Market</strong>
-		</p>
-	</div>
-	<?php
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	require_once CONECOM_PLUGIN_PATH . 'includes/CLI/Import_Products_Command.php';
+
+	/**
+	 * Registers our command when cli get's initialized.
+	 *
+	 * @since  1.0.0
+	 * @author David Perez
+	 */
+	function conecom_import_products_register_commands() {
+		WP_CLI::add_command( 'conecom', 'Import_Products_Command' );
+	}
+
+	add_action( 'cli_init', 'conecom_import_products_register_commands', 20 );
 }
 
-if ( wces_requirements_met() ) {
-	// Include files.
-	require_once plugin_dir_path( __FILE__ ) . '/includes/class-public.php';
-	require_once plugin_dir_path( __FILE__ ) . '/includes/class-admin.php';
-} else {
-	add_action( 'admin_notices', 'wces_requirements_error' );
+register_activation_hook( __FILE__, 'conecom_move_settings' );
+/**
+ * Move settings from old plugin to new plugin
+ *
+ * @return void
+ */
+function conecom_move_settings() {
+	CLOSE\ConnectEcommerce\Helpers\HELPER::move_settings();
 }
