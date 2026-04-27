@@ -70,7 +70,9 @@ class Orders {
 		$ecstatus                         = isset( $this->settings['ecstatus'] ) ? $this->settings['ecstatus'] : $this->options['order_only_order_completed'];
 		$this->meta_key_order             = '_' . $this->options['slug'] . '_invoice_id';
 
+		add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueues' ) );
 		add_action( 'wp_ajax_connect_ecommerce_sync_orders', array( $this, 'sync_orders' ) );
+		add_action( 'conecom_async_send_order_erp', array( $this, 'async_send_order_erp' ) );
 
 		if ( 'all' === $ecstatus ) {
 			add_action( 'woocommerce_order_status_pending', array( $this, 'send_order_erp' ) );
@@ -102,6 +104,30 @@ class Orders {
 	}
 
 	/**
+	 * Enqueues styles for orders admin page
+	 *
+	 * @return void
+	 */
+	public function admin_enqueues() {
+		$is_connect_ecommerce_page = isset( $_GET['page'] ) && 'connect_ecommerce' === $_GET['page'];
+		$current_tab               = isset( $_GET['tab'] ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'synchronization';
+		$current_subtab            = isset( $_GET['subtab'] ) ? sanitize_text_field( wp_unslash( $_GET['subtab'] ) ) : 'sync_products';
+
+		$is_sync_orders_page = $is_connect_ecommerce_page
+			&& 'synchronization' === $current_tab
+			&& 'sync_orders' === $current_subtab;
+
+		if ( $is_sync_orders_page ) {
+			wp_enqueue_style(
+				'conecom-admin-import',
+				CONECOM_PLUGIN_URL . 'includes/assets/admin-import.css',
+				array(),
+				CONECOM_VERSION
+			);
+		}
+	}
+
+	/**
 	 * Send order to ERP
 	 *
 	 * @param int $order_id Order id.
@@ -109,6 +135,27 @@ class Orders {
 	 * @return void
 	 */
 	public function send_order_erp( $order_id ) {
+		if ( function_exists( 'as_schedule_single_action' ) ) {
+			$pending = as_get_scheduled_actions( array(
+				'hook'   => 'conecom_async_send_order_erp',
+				'args'   => array( $order_id ),
+				'status' => \ActionScheduler_Store::STATUS_PENDING,
+			), 'ids' );
+			if ( empty( $pending ) ) {
+				as_schedule_single_action( time() + 30, 'conecom_async_send_order_erp', array( $order_id ), 'connect-ecommerce' );
+			}
+		} else {
+			ORDER::create_invoice( $this->settings, $order_id, $this->meta_key_order, $this->options['slug'], $this->connapi_erp );
+		}
+	}
+
+	/**
+	 * Process async order sync via Action Scheduler.
+	 *
+	 * @param int $order_id Order id.
+	 * @return void
+	 */
+	public function async_send_order_erp( $order_id ) {
 		ORDER::create_invoice( $this->settings, $order_id, $this->meta_key_order, $this->options['slug'], $this->connapi_erp );
 	}
 
@@ -263,7 +310,7 @@ class Orders {
 		$api_doc_id   = $order->get_meta( '_' . $this->options['slug'] . '_doc_id' );
 		$api_doc_type = $order->get_meta( '_' . $this->options['slug'] . '_doc_type' );
 
-		if ( $api_doc_id && method_exists( $this->connapi_erp, 'get_order_pdf' ) ) {
+		if ( $api_doc_id && ! empty( $this->connapi_erp ) && method_exists( $this->connapi_erp, 'get_order_pdf' ) ) {
 			$file_document_path = $this->connapi_erp->get_order_pdf( $settings, $api_doc_type, $api_doc_id );
 
 			// Check if file exists and is readable before attaching.
@@ -338,15 +385,31 @@ class Orders {
 		$order_id = isset( $_POST['order_id'] ) ? (int) sanitize_text_field( wp_unslash( $_POST['order_id'] ) ) : 0;
 		$type     = isset( $_POST['type'] ) ? sanitize_text_field( wp_unslash( $_POST['type'] ) ) : '';
 
+		$result = array(
+			'status'  => 'error',
+			'message' => __( 'Invalid request type', 'woocommerce-es' ),
+		);
+
 		if ( 'erp-post' === $type ) {
 			$result = ORDER::create_invoice( $this->settings, $order_id, $this->meta_key_order, $this->options['slug'], $this->connapi_erp, true );
 		}
-		wp_send_json_success(
-			array(
-				'message'  => $result['message'] ?? '',
-				'order_id' => $order_id,
-			)
-		);
+
+		// Check result status and respond accordingly.
+		if ( isset( $result['status'] ) && 'error' === $result['status'] ) {
+			wp_send_json_error(
+				array(
+					'message'  => $result['message'] ?? __( 'Unknown error occurred', 'woocommerce-es' ),
+					'order_id' => $order_id,
+				)
+			);
+		} else {
+			wp_send_json_success(
+				array(
+					'message'  => $result['message'] ?? __( 'Order sent successfully', 'woocommerce-es' ),
+					'order_id' => $order_id,
+				)
+			);
+		}
 	}
 }
 

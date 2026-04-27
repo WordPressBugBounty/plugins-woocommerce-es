@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'closemarketing/woocommerce-es',
-        'pretty_version' => '3.3.2',
-        'version' => '3.3.2.0',
-        'reference' => '8f93e30577bb4bd6ab05533c9d0112f3fa1c69c0',
+        'pretty_version' => '3.3.3',
+        'version' => '3.3.3.0',
+        'reference' => '2623d65e57334410714bd4dc6a429737f1f8dd5a',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'closemarketing/woocommerce-es' => array(
-            'pretty_version' => '3.3.2',
-            'version' => '3.3.2.0',
-            'reference' => '8f93e30577bb4bd6ab05533c9d0112f3fa1c69c0',
+            'pretty_version' => '3.3.3',
+            'version' => '3.3.3.0',
+            'reference' => '2623d65e57334410714bd4dc6a429737f1f8dd5a',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

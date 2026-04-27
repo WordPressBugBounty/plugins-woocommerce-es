@@ -5,8 +5,8 @@ Donate link: https://close.marketing/go/donate/
 Requires at least: 5.0
 Requires PHP: 7.4
 Tested up to: 6.9
-Stable tag: 3.3.2
-Version: 3.3.2
+Stable tag: 3.3.3
+Version: 3.3.3
 License: GPL2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,6 +19,21 @@ Add VAT Fields, Import European Taxes and check VAT compliance. Connect WooComme
 Connect WooCommerce Shop to ERP/CRM, Verifactu and EU/VAT Compliance is the ultimate solution for WooCommerce store owners who need seamless integration with their business management systems while ensuring full compliance with European tax regulations.
 
 Whether you're managing a small online store or a large e-commerce operation, this powerful plugin eliminates manual data entry, reduces errors, and saves countless hours of administrative work. Automatically synchronize your products, customers, and orders between WooCommerce and your ERP or CRM system, ensuring your inventory, customer database, and sales data are always up-to-date across all platforms.
+
+**Available Connectors**
+
+Free connector included:
+- [Clientify](https://close.marketing/likes/clientify/)
+
+Premium connectors:
+- [Holded](https://close.technology/en/wordpress-plugins/connect-woocommerce-holded/)
+- [FactuSol](https://close.technology/en/wordpress-plugins/connect-woocommerce-factusol/)
+- [FacturaDirecta](https://close.technology/en/wordpress-plugins/connect-woocommerce-facturadirecta/)
+- [Odoo](https://close.technology/en/wordpress-plugins/connect-woocommerce-odoo/)
+- [NEO POS](https://close.technology/en/wordpress-plugins/connect-woocommerce-neo/)
+- [Datisa](https://close.technology/en/wordpress-plugins/connect-woocommerce-datisa/)
+
+Need another connector? We offer custom integration services. [Contact us](https://close.technology/en/contact/)
 
 **Complete EU VAT Compliance Made Simple**
 
@@ -118,22 +133,10 @@ This plugin also includes specific adjustments to comply with Verifactu regulati
 - Complies with Verifactu and GDPR.
 - For ERPs that support it, you can send the payment method.
 
-This plugin serves as the foundation for various connectors. The free version supports:
-- [Clientify](https://close.marketing/likes/clientify/)
-
 **Merge variables**
 You can use this section to merge variables from ERP to WooCommerce. That means that you can merge categories, attributes, products, custom fields, taxonomies, etc.
 
 You will need to add Payment methods to merge variables to send the payment method to the ERP.
-
-Premium connectors include:
-- [Holded](https://close.technology/en/wordpress-plugins/connect-woocommerce-holded/)
-- [FacturaDirecta](https://close.technology/en/wordpress-plugins/connect-woocommerce-facturadirecta/)
-- [Odoo](https://close.technology/en/wordpress-plugins/connect-woocommerce-odoo/)
-- [NEO POS](https://close.technology/en/wordpress-plugins/connect-woocommerce-neo/)
-- [Datisa](https://close.technology/en/wordpress-plugins/connect-woocommerce-datisa/)
-
-Need another connector? We offer custom integration services. [Contact us](https://close.technology/en/contact/)
 
 == Frequently Asked Questions ==
 
@@ -217,6 +220,37 @@ The core connector integrates with Clientify, a CRM and marketing automation too
 This plugin uses the VIES (VAT Information Exchange System) service provided by the European Commission to validate EU VAT numbers. The VIES service is accessed through the dragonbe/vies PHP library. When a customer enters a VAT number during checkout, the plugin communicates with the VIES web service to verify the number's validity. This is an official EU service and does not store personal data. [VIES Information](https://ec.europa.eu/taxation_customs/vies/)
 
 == Changelog ==
+
+= 3.3.3 =
+* Enhancement: Improved order sync scheduling — prevents duplicate async jobs by checking for pending Action Scheduler actions before scheduling a new one.
+* Fixed: Admin CSS and WooCommerce schedule action on purchase.
+* Enhancement: My Account orders column — refactored and now shows an empty-state message when no orders are found.
+* Enhancement: Product import progress bar is always visible during import.
+* Enhancement: Added `is_connector_active()` check to prevent settings errors when the configured connector class is not loaded.
+* Fixed: Send to ERP button label updated.
+* Fixed: Error decimals in tax rates.
+* Added: Support to Factusol connector.
+* **Sync settings refactor:** Removed Synchronization > Automate tab; sync frequency ("When do you want to sync?") is now set on Synchronization > Products in the Automatic Sync section.
+* **Sync batch size:** Removed "How many products do you want to sync each time?"; batch size is now a fixed constant (50 products per run).
+* **Alerts:** "Email when all products are synced" moved to Settings > Alerts as "Enable Alerts Product synced" (global option).
+* **Product sync stats:** First stat label changed to "Available in [ERP name]" (e.g. Holded); when a tag filter is active, shows filtered count plus "Total" (unfiltered) in sublabel.
+* **Product sync stats:** Stats now respect the tag filter (filter products by tags) so counts match what is actually synced.
+* **Automatic Sync tab:** Replaced static message with Action Scheduler log table showing recent conecom_sync_* runs (date, status, frequency, logs).
+* Enhancement: Improved import products from API. Stats now shows the number of products fetched from the API.
+* Enhancement: Added payment method status to payment method mapping.
+* Fixed: Variations now inherit parent tax class correctly by setting tax_class to "parent" on creation.
+* Fixed: Tax class "parent" is preserved when products are re-synced/updated, preventing tax calculation inconsistencies.
+* Fixed: Alert notifications (Slack, email) no longer fire with "Order Submission Error" title when an order was already synced to the ERP or submitted successfully. Previously the already-synced branch incorrectly returned `status: error`, triggering a false alert.
+* Fixed: Duplicate alert on order submission exception — alert was sent twice (once in catch block, once in post-try check); now sent only once.
+* Enhancement: Alert notifications now reflect actual severity — errors use 🚨 emoji and red border, informational/success notifications use ✅ and green border.
+* Enhancement: Added comprehensive test coverage for variation tax class inheritance and persistence on updates.
+* Enhancement: Improved order sync UI feedback - success messages are shown in green and auto-hide after 5 seconds, errors show alerts.
+* Fixed: Product importer now correctly detects end of paginated product list, preventing unnecessary API calls beyond last product.
+* Enhancement: Added comprehensive test coverage for variation tax class inheritance and persistence on updates.
+* Enhancement: Added pagination end detection tests for product import with various edge cases (102/100, exact pages, multiple pages).
+* Enhancement: Added support to import custom fields from API to WooCommerce.
+* Fixed: Error checking if API is connected.
+* Fixed: Error filtering products by tags.
 
 = 3.3.2 =
 * Added: Support to FacturaDirecta connector.
